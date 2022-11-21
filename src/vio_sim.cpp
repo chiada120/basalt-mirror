@@ -886,7 +886,7 @@ void setup_vio(const std::string& config_path) {
   }
 
   vio = basalt::VioEstimatorFactory::getVioEstimator(
-      config, calib, basalt::constants::g, use_imu, use_double);
+      config, calib, basalt::constants::g, use_imu, use_double, false);
   vio->initialize(t_init_ns, T_w_i_init, vel_w_i_init, gt_gyro_bias.front(),
                   gt_accel_bias.front());
 

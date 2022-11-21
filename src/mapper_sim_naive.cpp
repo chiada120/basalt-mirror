@@ -724,7 +724,7 @@ void setup_vio() {
   config.vio_debug = true;
 
   vio = basalt::VioEstimatorFactory::getVioEstimator(config, calib, g, true,
-                                                     true);
+                                                     true, false);
   vio->initialize(t_init_ns, T_w_i_init, vel_w_i_init, gt_gyro_bias.front(),
                   gt_accel_bias.front());
 

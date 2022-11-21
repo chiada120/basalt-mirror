@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <basalt/vi_estimator/vio_estimator.h>
 
 #include <basalt/vi_estimator/sqrt_keypoint_vio.h>
+#include <basalt/vi_estimator/sqrt_keypoint_vio_mono.h>
 #include <basalt/vi_estimator/sqrt_keypoint_vo.h>
 
 namespace basalt {
@@ -45,12 +46,15 @@ namespace {
 template <class Scalar>
 VioEstimatorBase::Ptr factory_helper(const VioConfig& config,
                                      const Calibration<double>& cam,
-                                     const Eigen::Vector3d& g, bool use_imu) {
+                                     const Eigen::Vector3d& g, bool use_imu, bool mono_extend) {
   VioEstimatorBase::Ptr res;
 
   if (use_imu) {
-    res.reset(new SqrtKeypointVioEstimator<Scalar>(g, cam, config));
-
+    if (mono_extend) {
+      res.reset(new SqrtKeypointVioMonoEstimator<Scalar>(g, cam, config));
+    } else {
+      res.reset(new SqrtKeypointVioEstimator<Scalar>(g, cam, config));
+    }
   } else {
     res.reset(new SqrtKeypointVoEstimator<Scalar>(cam, config));
   }
@@ -62,16 +66,16 @@ VioEstimatorBase::Ptr factory_helper(const VioConfig& config,
 
 VioEstimatorBase::Ptr VioEstimatorFactory::getVioEstimator(
     const VioConfig& config, const Calibration<double>& cam,
-    const Eigen::Vector3d& g, bool use_imu, bool use_double) {
+    const Eigen::Vector3d& g, bool use_imu, bool use_double, bool mono_extend) {
   if (use_double) {
 #ifdef BASALT_INSTANTIATIONS_DOUBLE
-    return factory_helper<double>(config, cam, g, use_imu);
+    return factory_helper<double>(config, cam, g, use_imu, mono_extend);
 #else
     BASALT_LOG_FATAL("Compiled without double support.");
 #endif
   } else {
 #ifdef BASALT_INSTANTIATIONS_FLOAT
-    return factory_helper<float>(config, cam, g, use_imu);
+    return factory_helper<float>(config, cam, g, use_imu, mono_extend);
 #else
     BASALT_LOG_FATAL("Compiled without float support.");
 #endif
