@@ -238,6 +238,16 @@ void SqrtKeypointVioMonoEstimator<Scalar_>::initialize(const Eigen::Vector3d& bg
 
         while (data->t_ns <= curr_frame->t_ns) {
           meas->integrate(*data, accel_cov, gyro_cov);
+          PoseVelBiasState<Scalar> high_rate_state = last_state.getState();
+          meas->predictState(last_state.getState(), g, high_rate_state);
+          high_rate_state.t_ns = data->t_ns;
+          // std::cout << "T_w_i_" << high_rate_state.t_ns << std::endl;
+          // std::cout << high_rate_state.T_w_i.matrix() << std::endl;
+          if (out_state_queue) {
+            typename PoseVelBiasState<double>::Ptr out_data(
+                new PoseVelBiasState<double>(high_rate_state.template cast<double>()));
+            out_state_queue->push(out_data);
+          }
           data = popFromImuDataQueue();
           if (!data) break;
           data->accel = calib.calib_accel_bias.getCalibrated(data->accel);
@@ -249,6 +259,16 @@ void SqrtKeypointVioMonoEstimator<Scalar_>::initialize(const Eigen::Vector3d& bg
           int64_t tmp = data->t_ns;
           data->t_ns = curr_frame->t_ns;
           meas->integrate(*data, accel_cov, gyro_cov);
+          PoseVelBiasState<Scalar> high_rate_state = last_state.getState();
+          meas->predictState(last_state.getState(), g, high_rate_state);
+          high_rate_state.t_ns = data->t_ns;
+          // std::cout << "T_w_i_" << high_rate_state.t_ns << std::endl;
+          // std::cout << high_rate_state.T_w_i.matrix() << std::endl;
+          if (out_state_queue) {
+            typename PoseVelBiasState<double>::Ptr out_data(
+                new PoseVelBiasState<double>(high_rate_state.template cast<double>()));
+            out_state_queue->push(out_data);
+          }
           data->t_ns = tmp;
         }
       }

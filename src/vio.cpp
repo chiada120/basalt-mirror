@@ -773,7 +773,8 @@ void draw_scene(pangolin::View& view) {
 
   glColor3ubv(cam_color);
   if (!vio_t_w_i.empty()) {
-    size_t end = std::min(vio_t_w_i.size(), size_t(show_frame + 1));
+    // size_t end = std::min(vio_t_w_i.size(), size_t(show_frame + 1));
+    size_t end = vio_t_w_i.size();
     Eigen::aligned_vector<Eigen::Vector3d> sub_gt(vio_t_w_i.begin(),
                                                   vio_t_w_i.begin() + end);
     pangolin::glDrawLineStrip(sub_gt);
